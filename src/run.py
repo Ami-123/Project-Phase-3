@@ -8,6 +8,8 @@ import test_dataset
 
 import datetime
 import argparse
+from sklearn.model_selection import KFold
+
 
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support, classification_report
 
@@ -20,9 +22,7 @@ class Phase2:
     model = None
     saved_model = None
     dataset_path = ""
-    train_loader = None
     val_loader = None
-    test_loader = None
     data_loader = None
 
     def __init__(self, dir_path):
@@ -48,8 +48,8 @@ class Phase2:
             choice = input("Select : ").strip()
 
             if choice == '1':
-                if self.train_loader is None:
-                    [self.train_loader, self.val_loader, self.test_loader] = load_dataset.load_dataset_and_process(
+                if self.data_loader is None:
+                    self.data_loader= load_dataset.load_dataset_and_process(
                         self.device, self.dataset_path)
                     print("Dataset loaded")
                 else:
@@ -70,27 +70,37 @@ class Phase2:
                 else:
                     print("Wrong choice!!")
                     continue
-
-                model_name = "model-" + model_choice + "-" + str(datetime.datetime.now())
-                [train_corr1, val_corr1, train_loss1, val_loss1] = train_and_validate_dataset.train_and_validate_model(
-                    self.model, self.train_loader, self.val_loader)
-                torch.save(self.model, model_name + ".pth")
-                print("Model saved as " + model_name + ".pth")
-                generate_metrices.generate_accuracy_or_loss_matrix(val_corr1, train_corr1, model_name + "_accu.png")
-                generate_metrices.generate_accuracy_or_loss_matrix(val_loss1, train_loss1, model_name + "_loss.png",
+                k_folds = 5
+                kf = KFold(n_splits=k_folds, shuffle=True, random_state=42)
+                print(len(self.data_loader))
+                for fold, (train_idx, val_idx) in enumerate(kf.split(self.data_loader)):
+                    train_sampler = torch.utils.data.SubsetRandomSampler(train_idx)
+                    val_sampler = torch.utils.data.SubsetRandomSampler(val_idx)
+                    
+                    train_loader = torch.utils.data.DataLoader(self.data_loader, batch_size=self.BATCH_SIZE, sampler=train_sampler)
+                    val_loader = torch.utils.data.DataLoader(self.data_loader, batch_size=self.BATCH_SIZE, sampler=val_sampler)
+                    print(f"\nTraining Fold {fold + 1}/{k_folds}...")
+                    model_name = "model-" + model_choice + "-" + str(datetime.datetime.now())
+                    [train_corr1, val_corr1, train_loss1, val_loss1] = train_and_validate_dataset.train_and_validate_model(
+                        self.model, train_loader, val_loader)
+                    torch.save(self.model, model_name + ".pth")
+                    print("Model saved as " + model_name + ".pth")
+                    generate_metrices.generate_accuracy_or_loss_matrix(val_corr1, train_corr1, model_name + "_accu.png")
+                    generate_metrices.generate_accuracy_or_loss_matrix(val_loss1, train_loss1, model_name + "_loss.png",
                                                                   self.EPOCHS, True)
-                [y_true1, y_pred1] = test_dataset.get_test_results(self.model, self.test_loader)
-                generate_metrices.generate_confusion_matrix(y_true1, y_pred1, model_name + "_cf.png")
-                print(
-                    classification_report(y_true1, y_pred1, target_names=['angry', 'bored', 'focused', 'neutral']))
-                print("\n\nMicro - Precision, Recall, F1 Score \n")
-                print(precision_recall_fscore_support(y_true1, y_pred1, average='micro'))
-
-                print("\nMacro - Precision, Recall, F1 Score \n")
-                print(precision_recall_fscore_support(y_true1, y_pred1, average='macro'))
-
-                print("\nAccuracy")
-                print(accuracy_score(y_true1, y_pred1))
+                    [y_true1, y_pred1] = test_dataset.get_test_results(self.model, val_loader)
+                    generate_metrices.generate_confusion_matrix(y_true1, y_pred1, model_name + "_cf.png")
+                    print(
+                        classification_report(y_true1, y_pred1, target_names=['angry', 'bored', 'focused', 'neutral']))
+                    print("\n\nMicro - Precision, Recall, F1 Score \n")
+                    print(precision_recall_fscore_support(y_true1, y_pred1, average='micro'))
+                    
+                    print("\nMacro - Precision, Recall, F1 Score \n")
+                    print(precision_recall_fscore_support(y_true1, y_pred1, average='macro'))
+                    
+                    print("\nAccuracy")
+                    print(accuracy_score(y_true1, y_pred1))
+                print("\nK-Fold Cross-Validation Completed.")
 
             elif choice == '2':
                 input_model = input("Enter model relative path: (Ex. models/model3.pth) ").strip()
