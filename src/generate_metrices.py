@@ -4,11 +4,9 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import confusion_matrix,ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
-import seaborn as sn
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from sklearn.metrics import classification_report
 
-def generate_accuracy_or_loss_matrix(val_data,train_data,file_name="",epochs=30,is_loss_matrix=False):
+
+def generate_accuracy_or_loss_matrix(val_data,train_data,epochs,file_name="",is_loss_matrix=False):
     matrix='Loss' if is_loss_matrix else 'Accuracy'
    
     

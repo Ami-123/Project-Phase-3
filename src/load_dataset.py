@@ -12,18 +12,12 @@ transform = transforms.Compose([
     transforms.ToTensor(),  # Convert images to PyTorch tensors
 ])
 
-def load_dataset_and_process(device,dataset_path='data/',BATCH_SIZE=10):
+def load_dataset_and_process(dataset_path='data/'):
     torch.manual_seed(5)
 
     dataset_root = os.path.abspath(dataset_path)
     dataset = datasets.ImageFolder(root=dataset_root, transform=transform)
-    print(len(dataset))
-
-    data_loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
-
-    data_loader = [(X.to(device), y.to(device)) for X, y in data_loader]
-    print(len(data_loader))
-    return data_loader
+    return dataset
 
 def load_entire_dataset(device,dataset_path='data/',BATCH_SIZE=16):
     torch.manual_seed(6)
