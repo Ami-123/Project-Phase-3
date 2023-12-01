@@ -5,7 +5,6 @@ import torch.nn as nn
 def train_and_validate_model(model,train_loader,val_loader,epochs=30,max_train_batch=500,max_val_batch=100):
 
     criterion = nn.CrossEntropyLoss().to('cuda')
-    #criterion = criterion.to('cuda')
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001,weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5, verbose=True)
 
@@ -16,13 +15,6 @@ def train_and_validate_model(model,train_loader,val_loader,epochs=30,max_train_b
     train_correct = []
     val_correct = []
     
-    # # Early stopping parameters
-    # early_stop = False
-    # patience = 8  # Number of epochs with no improvement after which training will be stopped
-    # best_val_loss = float('inf')
- 
-    # epochs_without_improvement = 0
-
     for i in range(epochs):
         trn_corr = 0
         tst_corr = 0

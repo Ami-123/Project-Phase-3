@@ -12,26 +12,19 @@ transform = transforms.Compose([
     transforms.ToTensor(),  # Convert images to PyTorch tensors
 ])
 
-def load_dataset_and_proccess(device,dataset_path='/home/umang/COMP6721_AK6/processed_data/',split_proportions=[.70, .15, .15],BATCH_SIZE=10):
+def load_dataset_and_process(device,dataset_path='data/',split_proportions=[.70, .15, .15],BATCH_SIZE=10):
     torch.manual_seed(5)
 
-   
-    # Get the absolute path
     dataset_root = os.path.abspath(dataset_path)
-    
-    # Create a custom dataset
     dataset = datasets.ImageFolder(root=dataset_root, transform=transform)
     
-    # Calculate the sizes of the training, validation, and test sets
     lengths = [int(p * len(dataset)) for p in split_proportions]
     lengths[-1] = len(dataset) - sum(lengths[:-1])
     print(lengths,sum(lengths))
     
-    # Use random_split to split the dataset
     train_dataset, val_dataset, test_dataset = random_split(dataset,lengths)
     print(len(train_dataset.indices),len(val_dataset.indices),len(test_dataset.indices))
 
-     # Create DataLoader for each set
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
     test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
@@ -42,10 +35,9 @@ def load_dataset_and_proccess(device,dataset_path='/home/umang/COMP6721_AK6/proc
     
     return [train_loader,val_loader,test_loader]
 
-def load_entire_dataset(device,dataset_path='/home/umang/COMP6721_AK6/processed_data/',BATCH_SIZE=10):
+def load_entire_dataset(device,dataset_path='data/',BATCH_SIZE=10):
     torch.manual_seed(6)
       
-    # Get the absolute path
     dataset_root = os.path.abspath(dataset_path)
     
     # Create a custom dataset
