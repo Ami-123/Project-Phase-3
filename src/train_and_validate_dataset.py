@@ -2,7 +2,7 @@ import time
 import torch
 import torch.nn as nn
 
-def train_and_validate_model(model, train_loader, val_loader, fold_number, epochs=1, max_train_batch=500, max_val_batch=100, patience=5):
+def train_and_validate_model(model, train_loader, val_loader, fold_number, epochs, max_train_batch=500, max_val_batch=100, patience=3):
 
     criterion = nn.CrossEntropyLoss().to('cuda')
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-4)
