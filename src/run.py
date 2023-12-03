@@ -90,8 +90,8 @@ class Phase2:
                     print(val_corr1, train_corr1,)
                     generate_metrices.generate_accuracy_or_loss_matrix(val_corr1, train_corr1,self.EPOCHS,
                                                                         model_name + "_accu.png")
-                    generate_metrices.generate_accuracy_or_loss_matrix(val_loss1, train_loss1, model_name + "_loss.png",
-                                                                  self.EPOCHS, True) 
+                    generate_metrices.generate_accuracy_or_loss_matrix(val_loss1, train_loss1,self.EPOCHS, model_name + "_loss.png",
+                                                                   True) 
                     [y_true1, y_pred1] = test_dataset.get_test_results(self.model, val_loader)
                     generate_metrices.generate_confusion_matrix(y_true1, y_pred1, model_name + "_cf.png")
                     print(
