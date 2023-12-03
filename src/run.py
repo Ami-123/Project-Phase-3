@@ -12,7 +12,7 @@ from sklearn.metrics import accuracy_score, precision_recall_fscore_support, cla
 
 
 class Phase2:
-    EPOCHS = 1
+    EPOCHS = 2
     BATCH_SIZE = 10
     device = None
     LR = 0.001
@@ -88,22 +88,22 @@ class Phase2:
                         self.model, train_loader, val_loader,fold)
                     
                     print(val_corr1, train_corr1,)
-                    generate_metrices.generate_accuracy_or_loss_matrix(val_corr1, train_corr1,self.EPOCHS,
+                generate_metrices.generate_accuracy_or_loss_matrix(val_corr1, train_corr1,self.EPOCHS,
                                                                         model_name + "_accu.png")
-                    generate_metrices.generate_accuracy_or_loss_matrix(val_loss1, train_loss1,self.EPOCHS, model_name + "_loss.png",
+                generate_metrices.generate_accuracy_or_loss_matrix(val_loss1, train_loss1,self.EPOCHS, model_name + "_loss.png",
                                                                    True) 
-                    [y_true1, y_pred1] = test_dataset.get_test_results(self.model, val_loader)
-                    generate_metrices.generate_confusion_matrix(y_true1, y_pred1, model_name + "_cf.png")
-                    print(
-                        classification_report(y_true1, y_pred1, target_names=['angry', 'bored', 'focused', 'neutral']))
-                    print("\n\nMicro - Precision, Recall, F1 Score \n")
-                    print(precision_recall_fscore_support(y_true1, y_pred1, average='micro'))
+                [y_true1, y_pred1] = test_dataset.get_test_results(self.model, val_loader)
+                generate_metrices.generate_confusion_matrix(y_true1, y_pred1, model_name + "_cf.png")
+                print(
+                    classification_report(y_true1, y_pred1, target_names=['angry', 'bored', 'focused', 'neutral']))
+                print("\n\nMicro - Precision, Recall, F1 Score \n")
+                print(precision_recall_fscore_support(y_true1, y_pred1, average='micro'))
                     
-                    print("\nMacro - Precision, Recall, F1 Score \n")
-                    print(precision_recall_fscore_support(y_true1, y_pred1, average='macro'))
+                print("\nMacro - Precision, Recall, F1 Score \n")
+                print(precision_recall_fscore_support(y_true1, y_pred1, average='macro'))
                     
-                    print("\nAccuracy")
-                    print(accuracy_score(y_true1, y_pred1))
+                print("\nAccuracy")
+                print(accuracy_score(y_true1, y_pred1))
                 print("\nK-Fold Cross-Validation Completed.")
 
             elif choice == '2':
